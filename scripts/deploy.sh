@@ -1,11 +1,10 @@
 PRIVATE_KEY=$(source ./.env && echo $ENV_PRIV_KEY_PATH)
-# cargo stylus check
+cargo stylus check
 
 deployProxy() {
+    echo "Deploying proxy"
     cargo stylus deploy --private-key $PRIVATE_KEY --wasm-file-path target/wasm32-unknown-unknown/release/proxy.wasm
     echo "Proxy deployed"
-
-   
 
     cd src/proxy
     cargo stylus export-abi --output proxy_abi.sol
@@ -14,6 +13,7 @@ deployProxy() {
 }
 
 deployCounter(){
+    echo "Deploying Counter"
     cargo stylus deploy --private-key $PRIVATE_KEY --wasm-file-path target/wasm32-unknown-unknown/release/counter.wasm
     echo "Counter deployed"
 
@@ -35,5 +35,6 @@ implementation_interaction() {
 }
  
 # deployProxy
+# deployCounter
 proxy_interaction
 #implementation_interaction
