@@ -7,7 +7,7 @@ extern crate alloc;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 /// Import the Stylus SDK along with alloy primitive types for use in our program.
-use stylus_sdk::{alloy_primitives::Address, call::delegate_call, msg, prelude::*};
+use stylus_sdk::{alloy_primitives::Address, call::{delegate_call, Error}, msg, prelude::*};
 // mod counter;
 // use crate::counter::Counter;
 
@@ -67,7 +67,11 @@ impl Proxy {
         unsafe {
            res = delegate_call(self, implementation_address, &data[1..]);
         }
-        Ok(res?)
+
+        match res {
+            Ok(res) => Ok(res), 
+            Err(e) => Err(format!("Error: {:?}", e).into()),
+        }
     }
 }
 
