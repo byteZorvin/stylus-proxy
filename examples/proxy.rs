@@ -19,7 +19,7 @@ use std::sync::Arc;
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
-    let proxy_contract_address = "0x95b18031a6C118f24c339D2c2599F41533313421";
+    let proxy_contract_address = "0xb4F91ae3f90FA8A805582f9c667C6Be89fbc0667";
     let rpc_url = "https://stylus-testnet.arbitrum.io/rpc";
     let priv_key = "e788f2866a5775c1e34be91f5c7b0abf92f4e79e80d5fdcdfff194ea718322cf";
     abigen!(
@@ -55,8 +55,8 @@ async fn main() -> eyre::Result<()> {
 
     let proxy = Proxy::new(address, client);
     // let counter = Counter::new()
-    let _owner_address: Address = ("0x3647fc3a4209a4b302dcf8f7bb5d58defa6b9708").parse()?;
-    // proxy.init(_owner_address).send().await?;
+    let owner_address: Address = ("0x3647fc3a4209a4b302dcf8f7bb5d58defa6b9708").parse()?;
+    // proxy.init(owner_address).send().await?;
     // println!("Init successful");
 
     let implementation_address: Address = proxy.get_implementation().call().await?;
@@ -74,7 +74,7 @@ async fn main() -> eyre::Result<()> {
     println!("Updated implementation address: {:?}", updated_implementation_address);
 
     let number = U256::from(10u64);
-    let selector1 = function_selector!("relayToImplementation(uint8[])");
+    // let selector1 = function_selector!("relayToImplementation(uint8[])");
     let selector2 = function_selector!("setNumber(uint256)");
     let data = [
         // &selector1[..],
@@ -83,15 +83,27 @@ async fn main() -> eyre::Result<()> {
         &number.to_be_bytes::<32>()
     ]
     .concat();
-    // let relayed_data = proxy.relay_to_implementation(data.clone()).call().await?;
-    // println!("Relayed data: {:?}", relayed_data);
+    println!("Data: {:?}", data.clone());
+    println!("Number: {:?}", number);
+    proxy.relay_to_implementation(data).send().await?;
+
+    // let selector_get = function_selector!("number()");
+    // let data2 = [
+    //     // &selector1[..],
+    //     &selector_get[..],
+    //     // &10u64.to_be_bytes(),
+    // ].concat();
+
+    // let n_res = proxy.relay_to_implementation(data2.clone()).send().await?;
+    // println!("Get number called: {:?}", n_res);
+
 
     // let impl_addr: Address = ("0x46F4A131414E69Dde9257a6df34c1438379CABEC").parse()?;
 
     // let raw_call = RawCall::new().call(impl_addr, &data);
 
-    let relayed_data_try = proxy.relay_to_implementation_try().call().await?;
-    println!("Relayed data try: {:?}", relayed_data_try);
+    // let relayed_data_try = proxy.relay_to_implementation_try().call().await?;
+    // println!("Relayed data try: {:?}", relayed_data_try);
 
 
     Ok(())

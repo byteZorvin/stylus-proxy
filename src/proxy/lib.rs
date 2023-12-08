@@ -65,7 +65,7 @@ impl Proxy {
         let implementation_address = self.get_implementation()?;
         let res;
         unsafe {
-           res = delegate_call(self, implementation_address, &data[1..]);
+           res = delegate_call(self, implementation_address, &data[..]);
         }
 
         match res {
@@ -76,6 +76,7 @@ impl Proxy {
 
     pub fn relay_to_implementation_try(&mut self) -> Result<Vec<u8>, Vec<u8>> {
         let implementation_address = self.get_implementation()?;
+        println!("implementation_address: {:?}", implementation_address);
         let selector = function_selector!("setNumber(uint256)");
         let number = U256::from(10u64); 
         let data = [
@@ -83,6 +84,7 @@ impl Proxy {
             &number.to_be_bytes::<32>()
         ]
         .concat();
+        println!("data: {:?}", data);
         // unsafe {
         //    res = delegate_call(self, implementation_address, &data[..]);
         // }
