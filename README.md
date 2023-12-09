@@ -1,7 +1,7 @@
 cargo stylus deploy --wasm-file-path target/wasm32-unknown-unknown/release/counter.wasm --private-key=$pvt_key
 - Address: 0x2B3c8b0e5D7e6Dd5b7fD445d7e638a7FF8f0b1dA (counter)
 - Address: 0x117693Ba99250A53BBFdC1720Ebe9C4F06fDfa9c (proxy)
-
+- Address: 0xF58D20905CAb2A7CdB7ceb4FD829E1C0F36C7262 (counter v2)
 
 
 How to interact with the contract from cli?
@@ -18,4 +18,8 @@ let data = [
 ].concat();
 
 How to get proper function selector?
-HOw to parse return
+How to parse return
+
+
+
+

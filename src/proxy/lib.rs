@@ -8,17 +8,12 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 /// Import the Stylus SDK along with alloy primitive types for use in our program.
 use stylus_sdk::{alloy_primitives::Address, call::delegate_call, msg, prelude::*};
-// mod counter;
-// use crate::counter::Counter;
 
 sol_storage! {
     #[entrypoint]
     pub struct Proxy { 
         bool is_initialized;
         MetaInformation meta_information;
-
-        // #[borrow]
-        // Counter counter;
     }
 
     pub struct MetaInformation {
@@ -29,8 +24,6 @@ sol_storage! {
 }
 
 #[external]
-// #[inherit(Counter)]
-// unsafe {
 impl Proxy {
     pub fn init(&mut self, owner: Address) -> Result<(), Vec<u8>> {
         if self.is_initialized.get() {
@@ -67,11 +60,6 @@ impl Proxy {
         }
     }
 }
-
-// pub fn only_owner_function(&mut self) -> Result<(), Vec<u8>> {
-//     self.only_owner()?;
-//     Ok(())
-// }
 
 impl Proxy {
     pub fn only_owner(&mut self) -> Result<(), Vec<u8>> {

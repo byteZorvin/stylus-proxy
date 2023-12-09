@@ -17,8 +17,8 @@ deployCounter(){
     cargo stylus deploy --private-key $PRIVATE_KEY --wasm-file-path target/wasm32-unknown-unknown/release/counter.wasm
     echo "Counter deployed"
 
-    cd src/counter_impl
-    cargo stylus export-abi --output counter_abi.sol
+    cd src/counter_v1
+    cargo stylus export-abi --output counter_v1_abi.sol
     cd -
 }
 
@@ -44,8 +44,8 @@ implementation_interaction() {
     cd -
 }
  
-# deployProxy
-#deployCounter
-#deployCounterV2
-proxy_interaction
-implementation_interaction
+deployProxy
+deployCounter
+deployCounterV2
+# proxy_interaction
+# implementation_interaction
