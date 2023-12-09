@@ -35,10 +35,10 @@ pub unsafe fn load_bytes32(key: U256) -> B256;
 pub unsafe fn store_bytes32(key: U256, data: B256);
 ```
 
-### Current conract Addresses
-Proxy: 
-counter_v1: 
-counter_v2: 
+### Current contract Addresses
+Proxy: 0x1D16b2c1311540093c63Ab271c80331bC3C70902
+counter_v1: 0x31973Bc79631b05a3c030745391e44A9dce4B536
+counter_v2: 0x9232F290277C97947F09B1965b207621e19a5258
 
 ### Contribution
 Contributions to this project are welcome! Feel free to open issues for suggestions, bugs, or enhancements.
