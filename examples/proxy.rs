@@ -53,10 +53,10 @@ async fn main() -> eyre::Result<()> {
     abigen!(
         CounterV2,
         r#"[
-            function number() external view returns (uint256);
-            function setNumber(uint256 new_number) external;
-            function increment() external;
-            function decrement() external;
+            function number() external view returns (uint256)
+            function setNumber(uint256 new_number) external
+            function increment() external
+            function decrement() external
             event NumberSet(uint256 number)
         ]"#
     );
@@ -117,6 +117,7 @@ async fn main() -> eyre::Result<()> {
             // let log_data_int = Uint::from_le_bytes([data.logs[0].data.clone()]);
             let log_data_int = data.logs[0].data.clone();
             println!("Event log data {:?}", log_data_int);
+            // let int_value = U256::from_be_bytes(log_data_int.as_ref().try_into().unwrap());
             // let bytes_data = Bytes::from_hex("0x12")?;
             // println!("Data: {:?}", bytes_data);
             // assert!(log_data_int == bytes_data, "Not matching the event");
