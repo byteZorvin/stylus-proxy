@@ -5,21 +5,25 @@
 //! but with Stylus, it is accessible just as a normal Solidity smart contract is via an ABI.
 
 use ethers::{
+    core::types::Filter,
     middleware::SignerMiddleware,
     prelude::abigen,
+    prelude::{Contract, EthEvent},
     providers::{Http, Middleware, Provider},
     signers::{LocalWallet, Signer},
-    types::{Address}, utils::keccak256,
+    types::Address,
+    utils::keccak256,
 };
 use stylus_sdk::alloy_primitives::U256;
+
 // use eyre::eyre;
 // use std::io::{BufRead, BufReader};
-use std::{str::FromStr};
+use std::str::FromStr;
 use std::sync::Arc;
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
-    let proxy_contract_address = "0x312d3CEB4e2a3440d8E8f9B2FE0821d3e49b3f56";
+    let proxy_contract_address = "0x117693Ba99250A53BBFdC1720Ebe9C4F06fDfa9c";
     let rpc_url = "https://stylus-testnet.arbitrum.io/rpc";
     let priv_key = "e788f2866a5775c1e34be91f5c7b0abf92f4e79e80d5fdcdfff194ea718322cf";
     abigen!(
@@ -29,7 +33,6 @@ async fn main() -> eyre::Result<()> {
             function getImplementation() external view returns (address)
             function setImplementation(address implementation) external
             function relayToImplementation(uint8[] memory data) external returns (uint8[] memory)
-            function relayToImplementationTry() external returns (uint8[] memory)
         ]"#
     );
 
@@ -39,7 +42,8 @@ async fn main() -> eyre::Result<()> {
             function number() external view returns (uint256)
             function setNumber(uint256 new_number) external
             function increment() external
-    ]"#
+            event NumberSet(uint256 number)
+        ]"#
     );
 
     let provider = Provider::<Http>::try_from(rpc_url)?;
@@ -53,7 +57,7 @@ async fn main() -> eyre::Result<()> {
         wallet.clone().with_chain_id(chain_id),
     ));
 
-    let proxy = Proxy::new(address, client);
+    let proxy = Proxy::new(address, client.clone());
     let _owner_address: Address = ("0x3647fc3a4209a4b302dcf8f7bb5d58defa6b9708").parse()?;
     // proxy.init(_owner_address).send().await?.await?;
     // println!("Init successful");
@@ -64,7 +68,7 @@ async fn main() -> eyre::Result<()> {
         implementation_address
     );
 
-    // let new_implementation_address: Address = ("0x280D5a75ca406c9C427aE2c3b999f8dd4C57D119").parse()?;
+    // let new_implementation_address: Address = ("0x2B3c8b0e5D7e6Dd5b7fD445d7e638a7FF8f0b1dA").parse()?;
     // proxy.set_implementation(new_implementation_address).send().await?.await?;
 
     // println!("Called Set implementation successfully");
@@ -72,39 +76,38 @@ async fn main() -> eyre::Result<()> {
     // let updated_implementation_address = proxy.get_implementation().call().await?;
     // println!("Updated implementation address: {:?}", updated_implementation_address);
 
-    // let counter = Counter::new(implementation_address)
+
+    // let number = U256::from(10u64);
+    // let hashed_bytes1 = keccak256("setNumber(uint256)");
+    // println!("Hashed bytes using keccak {:?}", hashed_bytes1);
+
+    // let data1 = [&hashed_bytes1[..4], &number.to_be_bytes::<32>()].concat();
+    // println!("Data: {:?}", data1.clone());
+
+    // let relay_data1 = proxy.relay_to_implementation(data1).send().await?.await?;
+    // println!("Relayed data from set_number(): {:?}", relay_data1);
 
 
-    let number = U256::from(10u64);
-    let selector2 = keccak256("setNumber(uint256)");
-    println!("Selector using keccak {:?}", selector2);
+    let hashed_bytes2 = keccak256("increment()");
+    println!("Hashed bytes using keccak {:?}", hashed_bytes2);
 
-    let data = [
-        &selector2[..4],
-        &number.to_be_bytes::<32>()
-    ]
-    .concat();
-    println!("Data: {:?}", data.clone());
-    println!("Number: {:?}", number);
-    let relay_data = proxy.relay_to_implementation(data).send().await?.await?;
+    let data2 = [&hashed_bytes2[..4]].concat();
+    println!("Data: {:?}", data2.clone());
 
-    // let data2 = [
-    //     &selector1[..],
-    //     &selector_get[..],
-    //     // &10u64.to_be_bytes(),
-    // ].concat();
+    let relay_data2 = proxy.relay_to_implementation(data2).send().await?.await?;
+    println!("Relayed data from increment(): {:?}", relay_data2);
 
-    // let n_res = proxy.relay_to_implementation(data2.clone()).send().await?;
-    // println!("Get number called: {:?}", n_res);
-    println!("Relayed data: {:?}", relay_data);
 
+    //Read event
+    let filter = Filter::new().address(address).event("NumberSet(uint256)");
+    let logs = client.get_logs(&filter).await?;
+    println!("Event log {:?}", logs);
     // let impl_addr: Address = ("0x46F4A131414E69Dde9257a6df34c1438379CABEC").parse()?;
 
     // let raw_call = RawCall::new().call(impl_addr, &data);
 
     // proxy.relay_to_implementation_try().send().await?.await?;
     // println!("Relayed data try: {:?}", relayed_data_try);
-
 
     Ok(())
 }
