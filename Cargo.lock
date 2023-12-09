@@ -680,6 +680,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "counter_v2"
+version = "0.1.5"
+dependencies = [
+ "alloy-primitives 0.5.2",
+ "alloy-sol-types 0.3.1",
+ "ethers",
+ "eyre",
+ "hex",
+ "stylus-sdk",
+ "tokio",
+ "wee_alloc",
+]
+
+[[package]]
 name = "cpufeatures"
 version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"

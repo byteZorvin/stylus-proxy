@@ -25,6 +25,10 @@ async fn main() -> eyre::Result<()> {
     dotenv().ok();
     let priv_key = env::var("ENV_PRIV_KEY_PATH").expect("You've not set the Pvt key");
     let proxy_contract_address = "0x117693Ba99250A53BBFdC1720Ebe9C4F06fDfa9c";
+    let counter_v1_address: Address = ("0x280D5a75ca406c9C427aE2c3b999f8dd4C57D119").parse()?;
+    let counter_v2_address: Address = ("aldj").parse()?;
+
+
     let rpc_url = "https://stylus-testnet.arbitrum.io/rpc";
     abigen!(
         Proxy,
@@ -43,6 +47,17 @@ async fn main() -> eyre::Result<()> {
             function setNumber(uint256 new_number) external
             function increment() external
             event NumberSet(uint256 number)
+    ]"#
+    );
+
+    abigen!(
+        CounterV2,
+        r#"[
+            function number() external view returns (uint256);
+            function setNumber(uint256 new_number) external;
+            function increment() external;
+            function decrement() external;
+            event NumberSet(uint256 number)
         ]"#
     );
 
@@ -54,11 +69,14 @@ async fn main() -> eyre::Result<()> {
         provider,
         wallet.clone().with_chain_id(chain_id),
     ));
-
-    let proxy = Proxy::new(address, client.clone());
+    
+    let proxy = Proxy::new(address, client);
     let _owner_address: Address = ("0x3647fc3a4209a4b302dcf8f7bb5d58defa6b9708").parse()?;
     // proxy.init(_owner_address).send().await?.await?;
     // println!("Init successful");
+
+    proxy.set_implementation(counter_v1_address).send().await?.await?;
+    println!("Called Set implementation successfully");
 
     let implementation_address: Address = proxy.get_implementation().call().await?;
     println!(
@@ -132,5 +150,12 @@ async fn main() -> eyre::Result<()> {
     // proxy.relay_to_implementation_try().send().await?.await?;
     // println!("Relayed data try: {:?}", relayed_data_try);
 
+
+    // proxy.set_implementation(counter_v2_address).send().await?.await?;
+    // println!("Called Set implementation successfully");
+
+    // let updated_implementation_address = proxy.get_implementation().call().await?;
+    // println!("Updated implementation address: {:?}", updated_implementation_address);
+    
     Ok(())
 }
