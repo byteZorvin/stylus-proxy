@@ -9,12 +9,13 @@ use ethers::{
     prelude::abigen,
     providers::{Http, Middleware, Provider},
     signers::{LocalWallet, Signer},
-    types::Address,
+    types::{Address},
 };
-use stylus_sdk::{alloy_primitives::U256, function_selector, call::RawCall};
+use stylus_sdk::function_selector;
+use stylus_sdk::alloy_primitives::U256;
 // use eyre::eyre;
 // use std::io::{BufRead, BufReader};
-use std::str::FromStr;
+use std::{str::FromStr, fmt::format};
 use std::sync::Arc;
 
 #[tokio::main]
@@ -54,10 +55,9 @@ async fn main() -> eyre::Result<()> {
     ));
 
     let proxy = Proxy::new(address, client);
-    // let counter = Counter::new()
     let _owner_address: Address = ("0x3647fc3a4209a4b302dcf8f7bb5d58defa6b9708").parse()?;
-    proxy.init(_owner_address).send().await?.await?;
-    println!("Init successful");
+    // proxy.init(_owner_address).send().await?.await?;
+    // println!("Init successful");
 
     let implementation_address: Address = proxy.get_implementation().call().await?;
     println!(
@@ -65,43 +65,51 @@ async fn main() -> eyre::Result<()> {
         implementation_address
     );
 
-    let new_implementation_address: Address = ("0x280D5a75ca406c9C427aE2c3b999f8dd4C57D119").parse()?;
-    proxy.set_implementation(new_implementation_address).send().await?.await?;
+    // let new_implementation_address: Address = ("0x280D5a75ca406c9C427aE2c3b999f8dd4C57D119").parse()?;
+    // proxy.set_implementation(new_implementation_address).send().await?.await?;
 
-    println!("Called Set implementation successfully");
+    // println!("Called Set implementation successfully");
 
-    let updated_implementation_address = proxy.get_implementation().call().await?;
-    println!("Updated implementation address: {:?}", updated_implementation_address);
+    // let updated_implementation_address = proxy.get_implementation().call().await?;
+    // println!("Updated implementation address: {:?}", updated_implementation_address);
+
+    // let counter = Counter::new(implementation_address)
+
 
     let number = U256::from(10u64);
     // let selector2 = function_selector!("relayToImplementation(uint8[])");
-    let selector1 = function_selector!("setNumber(uint256)");
+    let selector1 = function_selector!("set_number(uint256)");
+    let selector = [63, 181, 193, 203];
+    // let selector_get = function_selector!("number()");
+    // let selector_get = [131, 129, 245, 138]; // number()
+    println!("{:?}", selector1);
+    let selector3 = function_selector!("function setNumber(uint256)");
+    println!("{:?}", selector3);
+
     let data = [
-        &selector1[..],
-        // &10u64.to_be_bytes(),
+        &selector[..],
         &number.to_be_bytes::<32>()
     ]
     .concat();
     println!("Data: {:?}", data.clone());
     println!("Number: {:?}", number);
-    proxy.relay_to_implementation(data).send().await?.await?;
+    let relay_data = proxy.relay_to_implementation(data).send().await?.await?;
 
-    // let selector_get = function_selector!("number()");
     // let data2 = [
-    //     // &selector1[..],
+    //     &selector1[..],
     //     &selector_get[..],
     //     // &10u64.to_be_bytes(),
     // ].concat();
 
     // let n_res = proxy.relay_to_implementation(data2.clone()).send().await?;
     // println!("Get number called: {:?}", n_res);
-
+    println!("Relayed data: {:?}", relay_data);
 
     // let impl_addr: Address = ("0x46F4A131414E69Dde9257a6df34c1438379CABEC").parse()?;
 
     // let raw_call = RawCall::new().call(impl_addr, &data);
 
-    proxy.relay_to_implementation_try().send().await?.await?;
+    // proxy.relay_to_implementation_try().send().await?.await?;
     // println!("Relayed data try: {:?}", relayed_data_try);
 
 

@@ -16,3 +16,6 @@ let data = [
     &self.asset.get().into_array(),
     &amount.to_be_bytes::<32>(),
 ].concat();
+
+How to get proper function selector?
+HOw to parse return

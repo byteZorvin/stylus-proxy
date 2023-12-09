@@ -9,12 +9,13 @@ use ethers::{
     prelude::abigen,
     providers::{Http, Middleware, Provider},
     signers::{LocalWallet, Signer},
-    types::Address,
+    types::{Address, U256}
 };
 // use eyre::eyre;
 // use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 use std::sync::Arc;
+// use stylus_sdk::alloy_primitives::U256;
 
 /// Your private key file path.
 // const ENV_PRIV_KEY_PATH: &str = "../.env";
@@ -43,7 +44,7 @@ async fn main() -> eyre::Result<()> {
     );
 
 
-    let program_address = "0x46F4A131414E69Dde9257a6df34c1438379CABEC";
+    let program_address = "0x280D5a75ca406c9C427aE2c3b999f8dd4C57D119";
     let rpc_url = "https://stylus-testnet.arbitrum.io/rpc";
     let priv_key = "e788f2866a5775c1e34be91f5c7b0abf92f4e79e80d5fdcdfff194ea718322cf";
     let provider = Provider::<Http>::try_from(rpc_url)?;
@@ -61,8 +62,12 @@ async fn main() -> eyre::Result<()> {
     let num = counter.number().call().await;
     println!("Counter number value = {:?}", num);
 
+    // println!("Successfully incremented counter via a tx");
+    
+    let _ = counter.set_number(U256::from(10)).send().await?.await?;
+    println!("Successfully set counter number via a tx");
+    
     let _ = counter.increment().send().await?.await?;
-    println!("Successfully incremented counter via a tx");
 
     let num = counter.number().call().await;
     println!("New counter number value = {:?}", num);

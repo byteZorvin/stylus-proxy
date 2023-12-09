@@ -62,7 +62,7 @@ impl Proxy {
         };
 
         match res {
-            Ok(res) => Ok(res), 
+            Ok(res) => Ok(res.into()), 
             Err(e) => Err(format!("Error: {:?}", e).into()),
         }
     }
