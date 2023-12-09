@@ -23,8 +23,8 @@ extern crate alloc;
 // static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 /// Import the Stylus SDK along with alloy primitive types for use in our program.
-use stylus_sdk::{alloy_primitives::U256, prelude::*};
-
+use stylus_sdk::{alloy_primitives::U256, evm, prelude::*};
+use alloy_sol_types::sol;
 // Define the entrypoint as a Solidity storage object, in this case a struct
 // called `Counter` with a single uint256 value called `number`. The sol_storage! macro
 // will generate Rust-equivalent structs with all fields mapped to Solidity-equivalent
@@ -34,6 +34,10 @@ sol_storage! {
     pub struct Counter {
         uint256 number;
     }
+}
+
+sol! {
+    event NumberSet(uint256 number);
 }
 
 /// Define an implementation of the generated Counter struct, defining a set_number
@@ -48,6 +52,10 @@ impl Counter {
     /// Sets a number in storage to a user-specified value.
     pub fn set_number(&mut self, new_number: U256) -> Result<(), Vec<u8>> {
         self.number.set(new_number);
+        let number = self.number.get();
+        evm::log(NumberSet {
+            number
+        });
         Ok(())
     }
 

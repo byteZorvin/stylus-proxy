@@ -9,13 +9,12 @@ use ethers::{
     prelude::abigen,
     providers::{Http, Middleware, Provider},
     signers::{LocalWallet, Signer},
-    types::{Address},
+    types::{Address}, utils::keccak256,
 };
-use stylus_sdk::function_selector;
 use stylus_sdk::alloy_primitives::U256;
 // use eyre::eyre;
 // use std::io::{BufRead, BufReader};
-use std::{str::FromStr, fmt::format};
+use std::{str::FromStr};
 use std::sync::Arc;
 
 #[tokio::main]
@@ -77,17 +76,11 @@ async fn main() -> eyre::Result<()> {
 
 
     let number = U256::from(10u64);
-    // let selector2 = function_selector!("relayToImplementation(uint8[])");
-    let selector1 = function_selector!("set_number(uint256)");
-    let selector = [63, 181, 193, 203];
-    // let selector_get = function_selector!("number()");
-    // let selector_get = [131, 129, 245, 138]; // number()
-    println!("{:?}", selector1);
-    let selector3 = function_selector!("function setNumber(uint256)");
-    println!("{:?}", selector3);
+    let selector2 = keccak256("setNumber(uint256)");
+    println!("Selector using keccak {:?}", selector2);
 
     let data = [
-        &selector[..],
+        &selector2[..4],
         &number.to_be_bytes::<32>()
     ]
     .concat();
