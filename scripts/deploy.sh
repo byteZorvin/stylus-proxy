@@ -22,6 +22,16 @@ deployCounter(){
     cd -
 }
 
+deployCounterV2() {
+    echo "Deploying New Counter Implementaion"
+    cargo stylus deploy --private-key $PRIVATE_KEY --wasm-file-path target/wasm32-unknown-unknown/release/counter_v2.wasm
+    echo "New Counter deployed"
+
+    cd src/counter_v2
+    cargo stylus export-abi --output counter_v2_abi.sol
+    cd -
+}
+
 proxy_interaction() {
     cd src/proxy
     cargo run --example interactions
@@ -36,5 +46,6 @@ implementation_interaction() {
  
 # deployProxy
 # deployCounter
+deployCounterV2
 proxy_interaction
 #implementation_interaction

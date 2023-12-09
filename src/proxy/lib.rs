@@ -13,7 +13,7 @@ use stylus_sdk::{alloy_primitives::{Address, U256}, call::delegate_call, msg, pr
 
 sol_storage! {
     #[entrypoint]
-    pub struct Proxy {
+    pub struct Proxy { 
         bool is_initialized;
         MetaInformation meta_information;
 
