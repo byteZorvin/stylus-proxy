@@ -5,17 +5,16 @@
 //! but with Stylus, it is accessible just as a normal Solidity smart contract is via an ABI.
 
 use ethers::{
-    core::types::Filter,
     middleware::SignerMiddleware,
     prelude::abigen,
-    prelude::{Contract, EthEvent},
     providers::{Http, Middleware, Provider},
     signers::{LocalWallet, Signer},
-    types::Address,
+    types::{Address},
     utils::keccak256,
 };
 use stylus_sdk::alloy_primitives::U256;
-
+use std::env;
+use dotenv::dotenv;
 // use eyre::eyre;
 // use std::io::{BufRead, BufReader};
 use std::str::FromStr;
@@ -23,9 +22,10 @@ use std::sync::Arc;
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
+    dotenv().ok();
+    let priv_key = env::var("ENV_PRIV_KEY_PATH").expect("You've not set the Pvt key");
     let proxy_contract_address = "0x117693Ba99250A53BBFdC1720Ebe9C4F06fDfa9c";
     let rpc_url = "https://stylus-testnet.arbitrum.io/rpc";
-    let priv_key = "e788f2866a5775c1e34be91f5c7b0abf92f4e79e80d5fdcdfff194ea718322cf";
     abigen!(
         Proxy,
         r#"[
@@ -48,8 +48,6 @@ async fn main() -> eyre::Result<()> {
 
     let provider = Provider::<Http>::try_from(rpc_url)?;
     let address: Address = proxy_contract_address.parse()?;
-
-    // let privkey = read_secret_from_file(&priv_key_path)?;
     let wallet = LocalWallet::from_str(&priv_key)?;
     let chain_id = provider.get_chainid().await?.as_u64();
     let client = Arc::new(SignerMiddleware::new(
@@ -68,24 +66,24 @@ async fn main() -> eyre::Result<()> {
         implementation_address
     );
 
-    // let new_implementation_address: Address = ("0x2B3c8b0e5D7e6Dd5b7fD445d7e638a7FF8f0b1dA").parse()?;
-    // proxy.set_implementation(new_implementation_address).send().await?.await?;
+    let new_implementation_address: Address = ("0x2B3c8b0e5D7e6Dd5b7fD445d7e638a7FF8f0b1dA").parse()?;
+    proxy.set_implementation(new_implementation_address).send().await?.await?;
 
-    // println!("Called Set implementation successfully");
+    println!("Called Set implementation successfully");
 
-    // let updated_implementation_address = proxy.get_implementation().call().await?;
-    // println!("Updated implementation address: {:?}", updated_implementation_address);
+    let updated_implementation_address = proxy.get_implementation().call().await?;
+    println!("Updated implementation address: {:?}", updated_implementation_address);
 
 
-    // let number = U256::from(10u64);
-    // let hashed_bytes1 = keccak256("setNumber(uint256)");
-    // println!("Hashed bytes using keccak {:?}", hashed_bytes1);
+    let number = U256::from(10u64);
+    let hashed_bytes1 = keccak256("setNumber(uint256)");
+    println!("Hashed bytes using keccak {:?}", hashed_bytes1);
 
-    // let data1 = [&hashed_bytes1[..4], &number.to_be_bytes::<32>()].concat();
-    // println!("Data: {:?}", data1.clone());
+    let data1 = [&hashed_bytes1[..4], &number.to_be_bytes::<32>()].concat();
+    println!("Data: {:?}", data1.clone());
 
-    // let relay_data1 = proxy.relay_to_implementation(data1).send().await?.await?;
-    // println!("Relayed data from set_number(): {:?}", relay_data1);
+    let relay_data1 = proxy.relay_to_implementation(data1).send().await?.await?;
+    println!("Relayed data from set_number(): {:?}", relay_data1);
 
 
     let hashed_bytes2 = keccak256("increment()");
@@ -96,12 +94,37 @@ async fn main() -> eyre::Result<()> {
 
     let relay_data2 = proxy.relay_to_implementation(data2).send().await?.await?;
     println!("Relayed data from increment(): {:?}", relay_data2);
+    match relay_data2 {
+        Some(data) => {
+            // let log_data_int = Uint::from_le_bytes([data.logs[0].data.clone()]);
+            let log_data_int = data.logs[0].data.clone();
+            println!("Event log data {:?}", log_data_int);
+            // let bytes_data = Bytes::from_hex("0x12")?;
+            // println!("Data: {:?}", bytes_data);
+            // assert!(log_data_int == bytes_data, "Not matching the event");
+            // let log_data_int = u64::from_be_bytes(relay_data2.as_ref().try_into
+            // ()?);
+        }, 
+        None => {
+            println!("No data returned");
+        }
+    }
 
+    let hashed_bytes_3 = keccak256("number()");
+    println!("Hashed bytes using keccak {:?}", hashed_bytes_3);
+    let data_3 = [&hashed_bytes_3[..4]].concat();
+    println!("Data: {:?}", data_3.clone());
+    let relayed_data_try = proxy.relay_to_implementation(data_3).send().await?.await?;
+    println!("Relayed data try: {:?}", relayed_data_try);
 
     //Read event
-    let filter = Filter::new().address(address).event("NumberSet(uint256)");
-    let logs = client.get_logs(&filter).await?;
-    println!("Event log {:?}", logs);
+    // let filter = Filter::new().address(address).event("NumberSet(uint256)");
+    // let logs = client.get_logs(&filter).await?;
+    // println!("Event log {:?}", logs);
+
+    // let log_data_int = u64::from_be_bytes(logs[0].data.as_ref().try_into()?);
+    // println!("Event log data {:?}", log_data_int);
+
     // let impl_addr: Address = ("0x46F4A131414E69Dde9257a6df34c1438379CABEC").parse()?;
 
     // let raw_call = RawCall::new().call(impl_addr, &data);

@@ -15,6 +15,8 @@ use ethers::{
 // use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 use std::sync::Arc;
+use std::env;
+use dotenv::dotenv;
 // use stylus_sdk::alloy_primitives::U256;
 
 /// Your private key file path.
@@ -28,12 +30,8 @@ use std::sync::Arc;
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
-    // let priv_key_path = std::env::var(ENV_PRIV_KEY_PATH)
-    //     .map_err(|_| eyre!("No {} env var set", ENV_PRIV_KEY_PATH))?;
-    // let rpc_url =
-    //     std::env::var(ENV_RPC_URL).map_err(|_| eyre!("No {} env var set", ENV_RPC_URL))?;
-    // let program_address = std::env::var(ENV_PROGRAM_ADDRESS)
-    //     .map_err(|_| eyre!("No {} env var set", ENV_PROGRAM_ADDRESS))?;
+    dotenv().ok();
+    let priv_key = env::var("ENV_PRIV_KEY_PATH").expect("You've not set the Pvt key");
     abigen!(
         Counter,
         r#"[
@@ -43,10 +41,9 @@ async fn main() -> eyre::Result<()> {
         ]"#
     );
 
-
+    
     let program_address = "0x280D5a75ca406c9C427aE2c3b999f8dd4C57D119";
     let rpc_url = "https://stylus-testnet.arbitrum.io/rpc";
-    let priv_key = "e788f2866a5775c1e34be91f5c7b0abf92f4e79e80d5fdcdfff194ea718322cf";
     let provider = Provider::<Http>::try_from(rpc_url)?;
     let address: Address = program_address.parse()?;
 
