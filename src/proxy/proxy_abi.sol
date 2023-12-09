@@ -11,6 +11,4 @@ interface IProxy {
     function setImplementation(address implementation) external;
 
     function relayToImplementation(uint8[] memory data) external returns (uint8[] memory);
-
-    function relayToImplementationTry() external;
 }

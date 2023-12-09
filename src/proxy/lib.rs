@@ -7,7 +7,7 @@ extern crate alloc;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 /// Import the Stylus SDK along with alloy primitive types for use in our program.
-use stylus_sdk::{alloy_primitives::{Address, U256}, call::delegate_call, msg, prelude::*, function_selector};
+use stylus_sdk::{alloy_primitives::Address, call::delegate_call, msg, prelude::*};
 // mod counter;
 // use crate::counter::Counter;
 
@@ -65,29 +65,6 @@ impl Proxy {
             Ok(res) => Ok(res.into()), 
             Err(e) => Err(format!("Error: {:?}", e).into()),
         }
-    }
-
-    pub fn relay_to_implementation_try(&mut self) -> Result<(), Vec<u8>> {
-        let implementation_address = self.get_implementation()?;
-        println!("implementation_address: {:?}", implementation_address);
-        let selector = function_selector!("setNumber(uint256)");
-        let number = U256::from(10u64); 
-        let data = [
-            &selector[..],
-            &number.to_be_bytes::<32>()
-        ]
-        .concat();
-        println!("data: {:?}", data);
-        unsafe {
-           delegate_call(self, implementation_address, &data[..])?
-        };
-        // let res = RawCall::new().call(implementation_address, &data);
-
-        // match res {
-        //     Ok(res) => Ok(res), 
-        //     Err(e) => Err(format!("Error: {:?}", e).into()),
-        // }
-        Ok(())
     }
 }
 

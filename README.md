@@ -1,6 +1,6 @@
 cargo stylus deploy --wasm-file-path target/wasm32-unknown-unknown/release/counter.wasm --private-key=$pvt_key
-- Address: 0x280D5a75ca406c9C427aE2c3b999f8dd4C57D119 (counter)
-- Address: 0x312d3CEB4e2a3440d8E8f9B2FE0821d3e49b3f56 (proxy)
+- Address: 0x2B3c8b0e5D7e6Dd5b7fD445d7e638a7FF8f0b1dA (counter)
+- Address: 0x117693Ba99250A53BBFdC1720Ebe9C4F06fDfa9c (proxy)
 
 
 

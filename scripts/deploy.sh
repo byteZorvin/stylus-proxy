@@ -45,7 +45,7 @@ implementation_interaction() {
 }
  
 # deployProxy
-# deployCounter
-deployCounterV2
+#deployCounter
+#deployCounterV2
 proxy_interaction
-#implementation_interaction
+implementation_interaction
